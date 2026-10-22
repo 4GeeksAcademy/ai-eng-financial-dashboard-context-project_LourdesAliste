@@ -11,12 +11,15 @@ Agents working on this project **must**:
 - Look for the **project memory bank** in:  
   `./memory-bank`  
   _(if the directory exists)_
+- Before working, read the relevant memory-bank documents. Use `product.md` for product behavior and `techContext.md` for stack, architecture, and integration context.
 
 - Before working on the frontend, read `./.agents/rules/frontend.md`.
 - Before working on the backend, read `./.agents/rules/backend.md`.
 - For changes that affect both frontend and backend, read both rule files.
 
 Before taking action (analyzing code, modifying files, or generating outputs), always review the latest files in these locations to ensure compliance with project conventions, context, and operational constraints.
+
+After every new implementation, update the relevant document in `./memory-bank` to reflect the implemented behavior or technical context. If no existing document fits, add an appropriate memory-bank document. Record only facts supported by the code and report verification as successful only when it was actually run.
 
 ## Project and stack
 
