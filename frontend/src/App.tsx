@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { DateRangeFilter as DateRangeFilterControl } from "@/components/dashboard/date-range-filter";
 import { KPIRow } from "@/components/dashboard/kpi-row";
 import { IncomeOutcomeChart } from "@/components/dashboard/income-outcome-chart";
 import { ProfitPercentChart } from "@/components/dashboard/profit-percent-chart";
 import {
+  type DateRangeFilter,
+  type FacetsResponse,
   type FinancialMovement,
   type KPIMetrics,
   type MonthlyDataPoint,
@@ -12,10 +15,26 @@ import { computeKPIs, computeMonthlyData } from "@/lib/financial-utils";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
-async function fetchFinancialData(): Promise<FinancialMovement[]> {
-  const response = await fetch(`${API_BASE_URL}/api/metrics`);
+async function fetchFinancialData(
+  filters: DateRangeFilter,
+  signal: AbortSignal,
+): Promise<FinancialMovement[]> {
+  const query = new URLSearchParams();
+  if (filters.start_date) query.set("start_date", filters.start_date);
+  if (filters.end_date) query.set("end_date", filters.end_date);
+  const queryString = query.toString();
+  const url = `${API_BASE_URL}/api/metrics${queryString ? `?${queryString}` : ""}`;
+  const response = await fetch(url, { signal });
   if (!response.ok) {
     throw new Error(`Failed to fetch financial data: ${response.status}`);
+  }
+  return response.json();
+}
+
+async function fetchFacets(): Promise<FacetsResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/metrics/facets`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch available date range: ${response.status}`);
   }
   return response.json();
 }
@@ -23,30 +42,78 @@ async function fetchFinancialData(): Promise<FinancialMovement[]> {
 function App() {
   const [metrics, setMetrics] = useState<KPIMetrics | null>(null);
   const [monthlyData, setMonthlyData] = useState<MonthlyDataPoint[]>([]);
+  const [facets, setFacets] = useState<FacetsResponse | null>(null);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const invalidRange = Boolean(startDate && endDate && startDate > endDate);
+
+  function updateStartDate(value: string) {
+    setStartDate(value);
+    setLoading(!(value && endDate && value > endDate));
+    setError(null);
+  }
+
+  function updateEndDate(value: string) {
+    setEndDate(value);
+    setLoading(!(startDate && value && startDate > value));
+    setError(null);
+  }
 
   useEffect(() => {
-    fetchFinancialData()
+    fetchFacets()
+      .then(setFacets)
+      .catch(() => {
+        setError(
+          "No se pudo cargar el rango de fechas disponible. Revisa la API de backend.",
+        );
+      });
+  }, []);
+
+  useEffect(() => {
+    if (invalidRange) return;
+
+    const controller = new AbortController();
+    const filters: DateRangeFilter = {
+      ...(startDate ? { start_date: startDate } : {}),
+      ...(endDate ? { end_date: endDate } : {}),
+    };
+
+    fetchFinancialData(filters, controller.signal)
       .then((movements) => {
         setMetrics(computeKPIs(movements));
         setMonthlyData(computeMonthlyData(movements));
       })
       .catch(() => {
-        setError(
-          "No se pudo cargar la informacion financiera. Revisa la API de backend.",
-        );
+        if (!controller.signal.aborted) {
+          setError(
+            "No se pudo cargar la informacion financiera. Revisa la API de backend.",
+          );
+        }
       })
       .finally(() => {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       });
-  }, []);
+
+    return () => controller.abort();
+  }, [startDate, endDate, invalidRange]);
 
   return (
     <main className="dark min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-8">
           <DashboardHeader period="2024 - Full Year" />
+
+          <DateRangeFilterControl
+            startDate={startDate}
+            endDate={endDate}
+            minDate={facets?.min_date ?? null}
+            maxDate={facets?.max_date ?? null}
+            invalidRange={invalidRange}
+            onStartDateChange={updateStartDate}
+            onEndDateChange={updateEndDate}
+          />
 
           {error ? (
             <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground">
