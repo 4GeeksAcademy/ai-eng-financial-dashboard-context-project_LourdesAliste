@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DateRangeFilter as DateRangeFilterControl } from "@/components/dashboard/date-range-filter";
+import { AlertsTable } from "@/components/dashboard/alerts-table";
 import { KPIRow } from "@/components/dashboard/kpi-row";
 import { IncomeOutcomeChart } from "@/components/dashboard/income-outcome-chart";
 import { ProfitPercentChart } from "@/components/dashboard/profit-percent-chart";
 import {
+  type AlertsParams,
+  type AlertsResponse,
   type DateRangeFilter,
   type FacetsResponse,
   type FinancialMovement,
@@ -39,26 +42,59 @@ async function fetchFacets(): Promise<FacetsResponse> {
   return response.json();
 }
 
+async function fetchAlerts(
+  params: AlertsParams,
+  signal: AbortSignal,
+): Promise<AlertsResponse> {
+  const query = new URLSearchParams({
+    threshold: String(params.threshold ?? 0.3),
+  });
+  if (params.start_date) query.set("start_date", params.start_date);
+  if (params.end_date) query.set("end_date", params.end_date);
+  const response = await fetch(
+    `${API_BASE_URL}/api/metrics/alerts?${query.toString()}`,
+    { signal },
+  );
+  if (!response.ok) {
+    throw new Error(`Failed to fetch alerts: ${response.status}`);
+  }
+  return response.json();
+}
+
 function App() {
   const [metrics, setMetrics] = useState<KPIMetrics | null>(null);
   const [monthlyData, setMonthlyData] = useState<MonthlyDataPoint[]>([]);
+  const [alerts, setAlerts] = useState<AlertsResponse>([]);
   const [facets, setFacets] = useState<FacetsResponse | null>(null);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [threshold, setThreshold] = useState(0.3);
   const [loading, setLoading] = useState(true);
+  const [alertsLoading, setAlertsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [alertsError, setAlertsError] = useState<string | null>(null);
   const invalidRange = Boolean(startDate && endDate && startDate > endDate);
 
   function updateStartDate(value: string) {
     setStartDate(value);
     setLoading(!(value && endDate && value > endDate));
+    setAlertsLoading(!(value && endDate && value > endDate));
     setError(null);
+    setAlertsError(null);
   }
 
   function updateEndDate(value: string) {
     setEndDate(value);
     setLoading(!(startDate && value && startDate > value));
+    setAlertsLoading(!(startDate && value && startDate > value));
     setError(null);
+    setAlertsError(null);
+  }
+
+  function updateThreshold(value: number) {
+    setThreshold(value);
+    setAlertsLoading(true);
+    setAlertsError(null);
   }
 
   useEffect(() => {
@@ -99,6 +135,30 @@ function App() {
     return () => controller.abort();
   }, [startDate, endDate, invalidRange]);
 
+  useEffect(() => {
+    if (invalidRange) return;
+
+    const controller = new AbortController();
+    const params: AlertsParams = {
+      threshold,
+      ...(startDate ? { start_date: startDate } : {}),
+      ...(endDate ? { end_date: endDate } : {}),
+    };
+
+    fetchAlerts(params, controller.signal)
+      .then(setAlerts)
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAlertsError("No se pudieron cargar las alertas.");
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setAlertsLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [startDate, endDate, invalidRange, threshold]);
+
   return (
     <main className="dark min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -132,6 +192,14 @@ function App() {
             <IncomeOutcomeChart data={monthlyData} loading={loading} />
             <ProfitPercentChart data={monthlyData} loading={loading} />
           </section>
+
+          <AlertsTable
+            alerts={alerts}
+            threshold={threshold}
+            loading={alertsLoading}
+            error={alertsError}
+            onThresholdChange={updateThreshold}
+          />
         </div>
       </div>
     </main>

@@ -24,6 +24,7 @@
 2. Vite reenvía `/api` a `http://backend:8000`, según [frontend/vite.config.ts](../frontend/vite.config.ts).
 3. En Docker Compose, `backend` es el nombre del servicio; esta resolución no está garantizada si Vite se ejecuta fuera de la red de Compose.
 4. FastAPI define `/health` y endpoints bajo `/api/metrics`, incluidos filtros, facets, resúmenes, categorías principales, comparaciones, alertas y segmentos B2B/B2C. La documentación interactiva está en `/docs`.
+5. `GET /api/metrics/alerts` devuelve alertas con `period`, `start_date`, `end_date`, `outcome_total`, `baseline_average` e `increase_ratio`. Los candidatos respetan el rango de fechas; la referencia usa los tres períodos anteriores de la misma granularidad, aunque precedan al inicio del rango. El límite de alerta es el primer y último día con egresos incluidos en el período.
 
 ## Datos y cálculos
 

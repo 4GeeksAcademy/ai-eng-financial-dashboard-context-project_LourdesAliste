@@ -57,6 +57,8 @@ class MetricsComparison(BaseModel):
 
 class MetricsAlert(BaseModel):
     period: str
+    start_date: date
+    end_date: date
     outcome_total: float
     baseline_average: float
     increase_ratio: float
@@ -158,6 +160,15 @@ def build_metrics_facets(movements: list[FinancialMovement]) -> MetricsFacets:
     )
 
 
+def period_key_for_date(value: date, group_by: GroupBy) -> str:
+    if group_by == "day":
+        return value.isoformat()
+    if group_by == "week":
+        iso_year, iso_week, _ = value.isocalendar()
+        return f"{iso_year}-W{iso_week:02d}"
+    return value.strftime("%Y-%m")
+
+
 def summarize_movements(
     movements: list[FinancialMovement],
     group_by: GroupBy,
@@ -166,14 +177,7 @@ def summarize_movements(
         lambda: {"income": 0.0, "outcome": 0.0}
     )
     for movement in movements:
-        if group_by == "day":
-            key = movement.create_date.isoformat()
-        elif group_by == "week":
-            iso_year, iso_week, _ = movement.create_date.isocalendar()
-            key = f"{iso_year}-W{iso_week:02d}"
-        else:
-            key = movement.create_date.strftime("%Y-%m")
-
+        key = period_key_for_date(movement.create_date, group_by)
         summary_map[key][movement.operation_type] += movement.amount
 
     return [
@@ -218,25 +222,46 @@ def calculate_net_value(movements: list[FinancialMovement]) -> float:
 
 def detect_outcome_alerts(
     summary: list[MetricsSummaryItem],
+    historical_summary: list[MetricsSummaryItem],
+    movements: list[FinancialMovement],
     threshold: float,
+    group_by: GroupBy,
 ) -> list[MetricsAlert]:
     alerts: list[MetricsAlert] = []
-    historical_outcomes: list[float] = []
+    historical_indexes = {
+        item.period: index for index, item in enumerate(historical_summary)
+    }
+    outcome_dates: dict[str, list[date]] = defaultdict(list)
+    for movement in movements:
+        if movement.operation_type == "outcome":
+            period = period_key_for_date(movement.create_date, group_by)
+            outcome_dates[period].append(movement.create_date)
+
     for item in summary:
-        if historical_outcomes:
-            baseline = sum(historical_outcomes) / len(historical_outcomes)
-            if baseline > 0:
-                increase_ratio = (item.outcome - baseline) / baseline
-                if increase_ratio > threshold:
-                    alerts.append(
-                        MetricsAlert(
-                            period=item.period,
-                            outcome_total=round(item.outcome, 2),
-                            baseline_average=round(baseline, 2),
-                            increase_ratio=round(increase_ratio, 4),
-                        )
-                    )
-        historical_outcomes.append(item.outcome)
+        index = historical_indexes.get(item.period)
+        if index is None or index < 3:
+            continue
+
+        previous_periods = historical_summary[index - 3:index]
+        baseline = sum(period.outcome for period in previous_periods) / 3
+        if baseline <= 0:
+            continue
+
+        increase_ratio = (item.outcome - baseline) / baseline
+        dates = outcome_dates.get(item.period, [])
+        if increase_ratio <= threshold or not dates:
+            continue
+
+        alerts.append(
+            MetricsAlert(
+                period=item.period,
+                start_date=min(dates),
+                end_date=max(dates),
+                outcome_total=round(item.outcome, 2),
+                baseline_average=round(baseline, 2),
+                increase_ratio=round(increase_ratio, 4),
+            )
+        )
     return alerts
 
 
@@ -352,11 +377,14 @@ def get_metrics_alerts(
         movements = [
             item for item in movements if item.business_type == business_type]
 
+    historical_summary = summarize_movements(movements, group_by)
     filtered = filter_movements(
         movements, start_date, end_date, category=None, operation_type=None
     )
     summary = summarize_movements(filtered, group_by)
-    return detect_outcome_alerts(summary, threshold)
+    return detect_outcome_alerts(
+        summary, historical_summary, filtered, threshold, group_by
+    )
 
 
 @router.get("/api/metrics/b2b", response_model=list[FinancialMovement])

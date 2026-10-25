@@ -23,6 +23,21 @@ export interface DateRangeFilter {
   end_date?: string
 }
 
+export interface AlertEntry {
+  period: string
+  start_date: string
+  end_date: string
+  outcome_total: number
+  baseline_average: number
+  increase_ratio: number
+}
+
+export type AlertsResponse = AlertEntry[]
+
+export interface AlertsParams extends DateRangeFilter {
+  threshold?: number
+}
+
 export interface KPIMetrics {
   totalIncome: number
   totalOutcome: number
