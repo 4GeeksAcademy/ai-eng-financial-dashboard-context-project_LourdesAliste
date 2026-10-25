@@ -14,6 +14,7 @@ Como usuario del dashboard, quiero seleccionar una fecha de inicio y una fecha d
 
 - Ofrecer los campos opcionales «Fecha inicio» y «Fecha fin», seleccionables de forma independiente.
 - Mostrar en los KPI y gráficos los datos correspondientes a las fechas indicadas, incluyendo ambos límites cuando estén informados.
+- Si la fecha de inicio es posterior a la fecha de fin, mostrar un mensaje informativo indicando que el rango no es válido y no aplicar el filtro hasta que el usuario corrija las fechas.
 - Mostrar todos los datos disponibles cuando ambos campos estén vacíos.
 - Consultar `GET /api/metrics` enviando las fechas informadas como `start_date` y `end_date`, en formato `YYYY-MM-DD`, y omitiendo los parámetros sin valor.
 - Obtener el rango disponible mediante `GET /api/metrics/facets` y mostrar la fecha más antigua (`min_date`) y la más reciente (`max_date`) cerca de los inputs.
@@ -30,10 +31,11 @@ Los siguientes escenarios constituyen los casos de prueba de la funcionalidad:
 | 2. Solo inicio | Seleccionar únicamente una fecha de inicio. | Se envía solo `start_date` y se muestran datos desde ese día, incluido. |
 | 3. Solo fin | Seleccionar únicamente una fecha de fin. | Se envía solo `end_date` y se muestran datos hasta ese día, incluido. |
 | 4. Rango completo | Seleccionar una fecha de inicio anterior o igual a la fecha de fin. | Se envían ambas fechas y se muestran únicamente datos del rango, incluidos sus límites. |
-| 5. Selección independiente | Cambiar o vaciar uno de los campos. | El otro campo conserva su valor. |
-| 6. Formato de fechas | Seleccionar una fecha en cualquiera de los campos. | La fecha se envía a la API en formato `YYYY-MM-DD`. |
-| 7. Rango disponible | Abrir el dashboard. | Se consulta `GET /api/metrics/facets` y se muestran `min_date` y `max_date` cerca de los inputs, identificadas como las fechas más antigua y más reciente disponibles. |
-| 8. Consistencia del dashboard | Cambiar las fechas seleccionadas. | Los KPI y ambos gráficos reflejan los datos correspondientes al filtro seleccionado. |
+| 5. Rango no válido | Seleccionar una fecha de inicio posterior a la fecha de fin. | Se muestra un mensaje informativo indicando que el rango no es válido y no se aplica el filtro hasta corregir las fechas. |
+| 6. Selección independiente | Cambiar o vaciar uno de los campos. | El otro campo conserva su valor. |
+| 7. Formato de fechas | Seleccionar una fecha en cualquiera de los campos. | La fecha se envía a la API en formato `YYYY-MM-DD`. |
+| 8. Rango disponible | Abrir el dashboard. | Se consulta `GET /api/metrics/facets` y se muestran `min_date` y `max_date` cerca de los inputs, identificadas como las fechas más antigua y más reciente disponibles. |
+| 9. Consistencia del dashboard | Cambiar las fechas seleccionadas. | Los KPI y ambos gráficos reflejan los datos correspondientes al filtro seleccionado. |
 
 # Fuera del alcance
 
