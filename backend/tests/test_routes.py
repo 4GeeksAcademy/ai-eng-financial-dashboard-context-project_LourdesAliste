@@ -3,7 +3,11 @@ from datetime import date
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.routes import filter_movements_by_date, generate_mock_movements
+from app.routes import (
+    FinancialMovement,
+    filter_movements_by_date,
+    generate_mock_movements,
+)
 
 
 client = TestClient(app)
@@ -183,7 +187,71 @@ def test_metrics_alerts_returns_anomaly_candidates():
         first = payload[0]
         assert set(first.keys()) == {
             "period",
+            "start_date",
+            "end_date",
             "outcome_total",
             "baseline_average",
             "increase_ratio",
         }
+
+
+def test_metrics_alerts_uses_three_previous_periods_and_date_range(monkeypatch):
+    movements = [
+        FinancialMovement(
+            create_date=date(2024, 1, 1), amount=1000,
+            operation_type="outcome", category="suppliers", business_type="B2B",
+        ),
+        FinancialMovement(
+            create_date=date(2024, 2, 1), amount=200,
+            operation_type="outcome", category="suppliers", business_type="B2B",
+        ),
+        FinancialMovement(
+            create_date=date(2024, 3, 1), amount=300,
+            operation_type="outcome", category="suppliers", business_type="B2B",
+        ),
+        FinancialMovement(
+            create_date=date(2024, 4, 1), amount=400,
+            operation_type="outcome", category="suppliers", business_type="B2B",
+        ),
+        FinancialMovement(
+            create_date=date(2024, 5, 1), amount=900,
+            operation_type="outcome", category="suppliers", business_type="B2B",
+        ),
+        FinancialMovement(
+            create_date=date(2024, 5, 4), amount=350,
+            operation_type="outcome", category="suppliers", business_type="B2B",
+        ),
+        FinancialMovement(
+            create_date=date(2024, 5, 10), amount=350,
+            operation_type="outcome", category="suppliers", business_type="B2B",
+        ),
+        FinancialMovement(
+            create_date=date(2024, 5, 15), amount=900,
+            operation_type="outcome", category="suppliers", business_type="B2B",
+        ),
+    ]
+    monkeypatch.setattr(
+        "app.routes.generate_mock_movements", lambda seed: movements
+    )
+
+    response = client.get(
+        "/api/metrics/alerts",
+        params={
+            "threshold": 0.3,
+            "group_by": "month",
+            "start_date": "2024-05-04",
+            "end_date": "2024-05-10",
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert len(payload) == 1
+    assert payload[0] == {
+        "period": "2024-05",
+        "start_date": "2024-05-04",
+        "end_date": "2024-05-10",
+        "outcome_total": 700.0,
+        "baseline_average": 300.0,
+        "increase_ratio": 1.3333,
+    }

@@ -10,6 +10,34 @@ export interface FinancialMovement {
   business_type: BusinessType
 }
 
+export interface FacetsResponse {
+  operation_types: OperationType[]
+  business_types: BusinessType[]
+  categories: Category[]
+  min_date: string
+  max_date: string
+}
+
+export interface DateRangeFilter {
+  start_date?: string
+  end_date?: string
+}
+
+export interface AlertEntry {
+  period: string
+  start_date: string
+  end_date: string
+  outcome_total: number
+  baseline_average: number
+  increase_ratio: number
+}
+
+export type AlertsResponse = AlertEntry[]
+
+export interface AlertsParams extends DateRangeFilter {
+  threshold?: number
+}
+
 export interface KPIMetrics {
   totalIncome: number
   totalOutcome: number
