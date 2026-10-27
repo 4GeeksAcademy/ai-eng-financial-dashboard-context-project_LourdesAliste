@@ -36,6 +36,8 @@ Después sigue el flujo afectado, según corresponda:
 - Backend: `backend/app/routes.py`
 - Frontend: `frontend/src/App.tsx`
 - Tipos: `frontend/src/lib/financial-types.ts`
+- Parsers runtime de respuestas: `frontend/src/lib/financial-types.ts`
+- Pruebas de parsers runtime: `frontend/src/lib/financial-types.test.ts`
 - Cálculos frontend: `frontend/src/lib/financial-utils.ts`
 - Pruebas frontend: `frontend/src/lib/financial-utils.test.ts`
 - Pruebas backend: `backend/tests/test_routes.py`
@@ -54,6 +56,7 @@ No inspecciones o modifiques todos estos archivos si el cambio no los afecta.
    - Compáralos con los tipos en `frontend/src/lib/financial-types.ts` y con el consumo en `frontend/src/App.tsx`.
    - Comprueba nombres, tipos, opcionalidad, nulabilidad, formatos de fecha y valores de enumeración.
    - No supongas que TypeScript valida automáticamente el JSON recibido en tiempo de ejecución.
+   - Comprueba que cada respuesta consumida pase por el parser runtime correspondiente. Amplía el parser existente en vez de duplicar validación inline; si no hay parser, decide si hace falta según exista un consumidor frontend.
    - Si un endpoint no tiene consumidor frontend, indícalo; no declares que falta un tipo TypeScript como defecto sin demostrar que el frontend lo necesita.
 
 3. **Traza los cálculos financieros**
@@ -76,6 +79,7 @@ No inspecciones o modifiques todos estos archivos si el cambio no los afecta.
 
 6. **Verifica**
    - Para cambios de cálculos, ejecuta las pruebas relevantes de `financial-utils.test.ts` o añade cobertura enfocada a los casos modificados.
+   - Para cambios de parsers o payloads consumidos por el frontend, ejecuta las pruebas pertinentes de `financial-types.test.ts`, incluyendo respuestas válidas e inválidas.
    - Para cambios de API, ejecuta las pruebas de rutas relacionadas y verifica la respuesta del endpoint.
    - Para cambios que cruzan ambas capas, comprueba los tipos, la respuesta API y las pruebas de ambos lados.
    - Usa los comandos del proyecto cuando el entorno lo permita:
@@ -115,7 +119,7 @@ Se revisaron `/api/metrics`, `/api/metrics/summary`, sus modelos de respuesta, e
 
 ### Cálculos
 
-`frontend/src/lib/financial-utils.ts` calcula beneficio como ingresos menos egresos y margen como beneficio dividido por ingresos, o cero si no hay ingresos. `frontend/src/lib/financial-utils.test.ts` contiene pruebas para esos casos. No se afirma que la fórmula frontend sea equivalente a una fórmula del endpoint de resumen sin una comparación que lo demuestre.
+`frontend/src/lib/financial-utils.ts` calcula beneficio como ingresos menos egresos y margen como beneficio dividido por ingresos, o cero si no hay ingresos. `frontend/src/lib/financial-utils.test.ts` contiene pruebas para esos casos. Los fetchers de `App.tsx` validan movimientos, facets y alertas con parsers de `financial-types.ts`, cubiertos por `financial-types.test.ts`. No se afirma que la fórmula frontend sea equivalente a una fórmula del endpoint de resumen sin una comparación que lo demuestre.
 
 ### Verificaciones
 
@@ -130,6 +134,7 @@ No se requiere añadir un tipo TypeScript para `/api/metrics/summary` mientras n
 ## Criterios de éxito
 
 - Cada campo o valor permitido modificado tiene correspondencia entre modelo backend, tipo frontend y consumidor, cuando exista.
+- Cada respuesta consumida por el frontend pasa por el parser runtime correspondiente y sus cambios tienen pruebas pertinentes.
 - Los cambios de comportamiento financiero están respaldados por una especificación; si no existe, el agente no inventa una.
 - Los cálculos permanecen centralizados y sus casos modificados tienen pruebas pertinentes.
 - Los cambios de API conservan filtros, orden cronológico e integración existente cuando aplican.

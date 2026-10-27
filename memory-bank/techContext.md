@@ -2,16 +2,17 @@
 
 ## Stack
 
-- **Frontend:** React y TypeScript con Vite. Usa Recharts para los gráficos y Vitest para pruebas. Los scripts están en [frontend/package.json](../frontend/package.json).
+- **Frontend:** React y TypeScript con Vite. Usa Recharts para los gráficos y Vitest para pruebas. La interfaz declara español como idioma, usa IBM Plex Sans desde Google Fonts con fallback de sistema, y mantiene los scripts en [frontend/package.json](../frontend/package.json).
 - **Backend:** Python con FastAPI y Uvicorn; las dependencias están en [backend/requirements.txt](../backend/requirements.txt) y el contenedor en [backend/Dockerfile](../backend/Dockerfile).
 - **Entorno integrado:** Docker Compose define los servicios `frontend` y `backend` en [docker-compose.yml](../docker-compose.yml).
 
 ## Estructura principal
 
 - `frontend/src/main.tsx`: punto de entrada de React.
-- `frontend/src/App.tsx`: carga `/api/metrics`, gestiona carga/error y compone el dashboard.
+- `frontend/src/App.tsx`: carga `/api/metrics`, `/api/metrics/facets` y `/api/metrics/alerts`, valida los payloads con parsers y compone el dashboard con estados de carga/error.
 - `frontend/src/components/dashboard/`: tarjetas KPI y gráficos.
-- `frontend/src/lib/financial-types.ts`: tipos TypeScript para los movimientos y datos del dashboard.
+- `frontend/src/lib/financial-types.ts`: tipos TypeScript y parsers runtime para movimientos, facets y alertas.
+- `frontend/src/lib/financial-types.test.ts`: pruebas de payloads válidos e inválidos para esos parsers.
 - `frontend/src/lib/financial-utils.ts`: cálculos KPI y agregación mensual.
 - `frontend/src/lib/financial-utils.test.ts`: pruebas de los cálculos frontend.
 - `backend/app/main.py`: crea la aplicación FastAPI y registra el router.
@@ -30,8 +31,10 @@
 
 - Las rutas generan datos de ejemplo con semilla `42`: 30 movimientos por cada uno de 12 meses. Los años se asignan respecto a `date.today()`; no son un período calendario fijo ni datos persistidos en el flujo revisado.
 - El frontend calcula beneficio como ingresos menos egresos. El porcentaje es beneficio dividido por ingresos, o cero cuando no hay ingresos.
-- El título del dashboard está fijado en `2024 - Full Year`; no debe usarse como fuente del período real de los datos.
+- El título del dashboard está fijado en `2024 - Año completo`; no debe usarse como fuente del período real de los datos.
 - Los modelos de respuesta del backend y los tipos TypeScript son contratos duplicados y deben mantenerse sincronizados.
+- Los fetchers del frontend pasan las respuestas JSON por parsers en `financial-types.ts`; los tipos TypeScript por sí solos no validan datos en ejecución.
+- Los gráficos incluyen tablas `sr-only` con sus datos; `App.tsx` comunica carga y errores con estados ARIA.
 
 ## Comandos
 
@@ -62,16 +65,34 @@ Los comandos están documentados en [README.es.md](../README.es.md) y sus script
 
 ### frontend-design
 
-**Motivo de instalación**: orientar al agente en el diseño y la implementación de interfaces frontend, buscando una presentación visual coherente y adecuada al propósito del producto.
+**Finalidad**: orientar decisiones visuales de interfaz, adecuadas al propósito del producto.
 
-**Uso**: aplicar esta skill al crear o modificar pantallas y componentes visuales.
+**Cuándo usarla**: al crear o modificar pantallas, componentes, tipografía, contenido o estructura visual.
 
-**Criterios**: respetar la arquitectura, las tecnologías y los requisitos funcionales del proyecto, y comprobar que los cambios no perjudican la usabilidad ni la accesibilidad.
+**Criterios de validación**: las elecciones responden al dashboard financiero y al brief; copy, tipografía y jerarquía son coherentes; se preservan usabilidad responsive y accesibilidad.
 
 ### financial-api-contracts
 
-**Motivo de instalación**: mantener coherentes los contratos de métricas y el comportamiento financiero entre FastAPI y React/TypeScript.
+**Finalidad**: mantener coherentes contratos API y comportamiento financiero observable entre FastAPI y React/TypeScript.
 
-**Uso**: aplicar esta skill al cambiar o auditar endpoints, modelos Pydantic, tipos TypeScript, KPI, agregaciones, comparaciones o alertas.
+**Cuándo usarla**: al cambiar o auditar endpoints, modelos Pydantic, tipos, parsers runtime, KPI, agregaciones, comparaciones o alertas.
 
-**Límites**: no sustituye las skills de accesibilidad, diseño frontend o rendimiento React, ni convierte las fórmulas actuales en requisitos de negocio aprobados.
+**Criterios de validación**: contrastar campos y valores entre backend, tipos, parsers y consumidores; probar payloads/cálculos afectados; distinguir comportamiento de código de requisitos de negocio.
+
+**Límites**: no sustituye accesibilidad, diseño frontend ni rendimiento React; no convierte las fórmulas actuales en requisitos de negocio aprobados.
+
+### accessibility
+
+**Finalidad**: orientar la implementación y auditoría de accesibilidad web según WCAG 2.2.
+
+**Cuándo usarla**: al crear o revisar controles, formularios, gráficos, estados dinámicos, navegación por teclado o soporte para lectores de pantalla.
+
+**Criterios de validación**: comprobar nombre/rol/valor, operación por teclado y foco visible, contraste mínimo 4.5:1 para texto normal y 3:1 para texto grande/controles, objetivos de al menos 24x24 CSS px, alternativas textuales y anuncios dinámicos; no afirmar pruebas manuales que no se hayan ejecutado.
+
+### vercel-react-best-practices
+
+**Finalidad**: orientar optimizaciones de rendimiento React y Next.js.
+
+**Cuándo usarla**: al implementar o revisar fetching, bundle, renderizado o renders repetidos de componentes React.
+
+**Criterios de validación**: seleccionar una regla pertinente, demostrar el patrón en el código y usar una verificación proporcional; no recomendar memoización u otras optimizaciones sin evidencia de trabajo evitado o costo relevante.

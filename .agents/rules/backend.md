@@ -15,6 +15,7 @@ Preservar contratos estables de API, mantener los filtros y cálculos reutilizab
 4. Evita alterar el generador aleatorio global al crear los datos. La implementación actual llama `random.seed(seed)` y después usa funciones globales de `random`; prefiere una instancia local `random.Random(seed)` y sus métodos para no modificar estado compartido del proceso.
 5. Antes de indexar listas derivadas de movimientos, define y maneja el caso vacío. `build_metrics_facets` accede a `ordered[0]` y `ordered[-1]`; si el origen pudiera estar vacío, acuerda el comportamiento de respuesta y cúbrelo con una prueba antes de acceder a esos índices.
 6. Actualiza `backend/tests/test_routes.py` cuando cambien parámetros, filtros, orden o forma de las respuestas. No declares pruebas exitosas sin ejecutarlas.
+7. Usa `.agents/skills/financial-api-contracts/SKILL.md` al cambiar o auditar contratos de métricas o comportamiento financiero entre FastAPI y el frontend; sigue su flujo de contraste y no inventes requisitos de negocio.
 
 ## Ejemplos correctos e incorrectos
 
