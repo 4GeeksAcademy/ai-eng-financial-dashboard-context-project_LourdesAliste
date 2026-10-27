@@ -67,3 +67,11 @@ Los comandos están documentados en [README.es.md](../README.es.md) y sus script
 **Uso**: aplicar esta skill al crear o modificar pantallas y componentes visuales.
 
 **Criterios**: respetar la arquitectura, las tecnologías y los requisitos funcionales del proyecto, y comprobar que los cambios no perjudican la usabilidad ni la accesibilidad.
+
+### financial-api-contracts
+
+**Motivo de instalación**: mantener coherentes los contratos de métricas y el comportamiento financiero entre FastAPI y React/TypeScript.
+
+**Uso**: aplicar esta skill al cambiar o auditar endpoints, modelos Pydantic, tipos TypeScript, KPI, agregaciones, comparaciones o alertas.
+
+**Límites**: no sustituye las skills de accesibilidad, diseño frontend o rendimiento React, ni convierte las fórmulas actuales en requisitos de negocio aprobados.

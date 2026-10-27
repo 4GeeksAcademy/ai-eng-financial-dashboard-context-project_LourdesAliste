@@ -6,6 +6,9 @@ import { KPIRow } from "@/components/dashboard/kpi-row";
 import { IncomeOutcomeChart } from "@/components/dashboard/income-outcome-chart";
 import { ProfitPercentChart } from "@/components/dashboard/profit-percent-chart";
 import {
+  parseAlertsResponse,
+  parseFacetsResponse,
+  parseFinancialMovements,
   type AlertsParams,
   type AlertsResponse,
   type DateRangeFilter,
@@ -31,7 +34,7 @@ async function fetchFinancialData(
   if (!response.ok) {
     throw new Error(`Failed to fetch financial data: ${response.status}`);
   }
-  return response.json();
+  return parseFinancialMovements(await response.json());
 }
 
 async function fetchFacets(): Promise<FacetsResponse> {
@@ -39,7 +42,7 @@ async function fetchFacets(): Promise<FacetsResponse> {
   if (!response.ok) {
     throw new Error(`Failed to fetch available date range: ${response.status}`);
   }
-  return response.json();
+  return parseFacetsResponse(await response.json());
 }
 
 async function fetchAlerts(
@@ -58,7 +61,7 @@ async function fetchAlerts(
   if (!response.ok) {
     throw new Error(`Failed to fetch alerts: ${response.status}`);
   }
-  return response.json();
+  return parseAlertsResponse(await response.json());
 }
 
 function App() {
