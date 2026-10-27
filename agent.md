@@ -25,7 +25,7 @@ El README documenta el inicio; los scripts frontend están en `frontend/package.
 ## Reglas de dominio
 - El backend genera 360 movimientos de ejemplo: 30 por mes durante 12 meses, con semilla `42` y fechas relativas a la fecha actual.
 - El frontend calcula beneficio como ingresos menos egresos y margen como beneficio dividido por ingresos; con ingresos cero, el margen es cero.
-- El título actual fija `2024 - Full Year`; no asumir que coincide con las fechas generadas.
+- El título actual fija `2024 - Año completo`; no asumir que coincide con las fechas generadas.
 
 ## Formas de trabajar
 - Antes de cambiar una ruta, revisar su modelo de respuesta, filtros y pruebas.

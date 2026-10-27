@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type MonthlyDataPoint } from '@/lib/financial-types'
@@ -46,7 +47,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   )
 }
 
-export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
+export const IncomeOutcomeChart = memo(function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
   if (loading) {
     return (
       <Card className="border-border/60">
@@ -66,13 +67,13 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
   return (
     <Card className="border-border/60">
       <CardHeader className="pb-4">
-        <CardTitle className="text-base font-semibold">Income vs. Outcome</CardTitle>
-        <CardDescription>Monthly revenue and expenditure evolution</CardDescription>
+        <CardTitle className="text-base font-semibold">Ingresos y egresos</CardTitle>
+        <CardDescription>Evolución mensual de ingresos y egresos</CardDescription>
       </CardHeader>
       <CardContent>
         {!hasData ? (
           <div className="flex h-[280px] items-center justify-center text-muted-foreground text-sm">
-            No data available to display
+            No hay datos para mostrar
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={280}>
@@ -100,7 +101,7 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
               <Line
                 type="monotone"
                 dataKey="income"
-                name="income"
+                name="Ingresos"
                 stroke="var(--chart-income)"
                 strokeWidth={2}
                 dot={{ r: 3, fill: 'var(--chart-income)', strokeWidth: 0 }}
@@ -109,7 +110,7 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
               <Line
                 type="monotone"
                 dataKey="outcome"
-                name="outcome"
+                name="Egresos"
                 stroke="var(--chart-outcome)"
                 strokeWidth={2}
                 dot={{ r: 3, fill: 'var(--chart-outcome)', strokeWidth: 0 }}
@@ -117,8 +118,27 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
               />
             </LineChart>
           </ResponsiveContainer>
+          <table className="sr-only">
+            <caption>Datos mensuales de ingresos y egresos</caption>
+            <thead>
+              <tr>
+                <th scope="col">Mes</th>
+                <th scope="col">Ingresos</th>
+                <th scope="col">Egresos</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((point) => (
+                <tr key={point.month}>
+                  <th scope="row">{point.month}</th>
+                  <td>{formatCurrency(point.income)}</td>
+                  <td>{formatCurrency(point.outcome)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </CardContent>
     </Card>
   )
-}
+})

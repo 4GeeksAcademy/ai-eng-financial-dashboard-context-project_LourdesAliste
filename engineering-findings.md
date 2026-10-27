@@ -25,7 +25,7 @@ Reglas derivadas de la revisión del código existente. Las referencias muestran
 ### FE-4. No presentar un período fijo como período real de los datos
 
 - **Regla:** El título del dashboard debe corresponder al intervalo mostrado o identificarse claramente como texto fijo; si cambia la generación de fechas, revisar también el período presentado.
-- **Hallazgo:** El encabezado está fijado en `2024 - Full Year`, mientras las fechas del backend dependen de la fecha actual.
+- **Hallazgo:** El encabezado está fijado en `2024 - Año completo`, mientras las fechas del backend dependen de la fecha actual.
 - **Archivos que la justifican:** [frontend/src/App.tsx](frontend/src/App.tsx), [backend/app/routes.py](backend/app/routes.py).
 
 ## Backend
@@ -56,11 +56,11 @@ Reglas derivadas de la revisión del código existente. Las referencias muestran
 
 ## Integración
 
-### INT-1. Sincronizar los tipos del frontend con los modelos del backend
+### INT-1. Sincronizar los contratos y la validación runtime del frontend
 
-- **Regla:** Cualquier cambio a nombres de campos o valores admitidos por la API debe actualizarse en backend y frontend en el mismo cambio.
-- **Hallazgo:** El backend define campos como `create_date`, `operation_type` y `business_type`; los tipos TypeScript los representan con esos mismos nombres y valores.
-- **Archivos que la justifican:** [backend/app/routes.py](backend/app/routes.py), [frontend/src/lib/financial-types.ts](frontend/src/lib/financial-types.ts).
+- **Regla:** Cualquier cambio a nombres de campos o valores admitidos por la API debe actualizarse en el modelo backend, el tipo frontend y el parser runtime consumido, con pruebas pertinentes.
+- **Hallazgo:** El backend define campos como `create_date`, `operation_type` y `business_type`; `financial-types.ts` declara los tipos y valida movimientos, facets y alertas antes de su consumo en `App.tsx`.
+- **Archivos que la justifican:** [backend/app/routes.py](backend/app/routes.py), [frontend/src/lib/financial-types.ts](frontend/src/lib/financial-types.ts), [frontend/src/lib/financial-types.test.ts](frontend/src/lib/financial-types.test.ts), [frontend/src/App.tsx](frontend/src/App.tsx).
 
 ### INT-2. Mantener alineados el proxy de Vite y el servicio de Compose
 

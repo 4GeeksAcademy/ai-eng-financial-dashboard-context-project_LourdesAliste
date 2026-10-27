@@ -7,6 +7,7 @@ Aplicación web de métricas financieras. El frontend presenta totales de ingres
 ## Componentes y flujo
 
 - **Frontend:** React y TypeScript. `frontend/src/App.tsx` solicita `/api/metrics`, calcula los KPI y los datos mensuales con `frontend/src/lib/financial-utils.ts`, y muestra las tarjetas y gráficos del dashboard.
+- La interfaz visible está en español; incluye filtros de fechas, KPI, gráficos y alertas.
 - **Backend:** FastAPI. `backend/app/routes.py` sirve movimientos y ofrece rutas para salud, filtros, segmentos B2B/B2C, facets, resúmenes, categorías principales, comparación y alertas.
 - **Comunicación:** Vite reenvía `/api` a `http://backend:8000`, el servicio backend definido en Docker Compose.
 
@@ -18,7 +19,7 @@ Aplicación web de métricas financieras. El frontend presenta totales de ingres
 
 ## Límites confirmados
 
-- El título visible está fijado en `2024 - Full Year`; no debe presentarse como prueba de que los movimientos corresponden a 2024.
+- El título visible está fijado en `2024 - Año completo`; no debe presentarse como prueba de que los movimientos corresponden a 2024 ni de que el rango generado coincida con ese período.
 - En las rutas revisadas, los movimientos se generan como datos de ejemplo. No describirlos como datos reales o persistidos.
 - El proyecto revisado no especifica un perfil de usuario, requisitos de negocio para las fórmulas ni una fuente de datos real. No atribuirle esos objetivos o capacidades sin documentación adicional.
 

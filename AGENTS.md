@@ -40,6 +40,7 @@ After every new implementation, update the relevant document in `./memory-bank` 
 ## Conventions
 
 - Keep API response models in sync with the corresponding TypeScript types.
+- Validate consumed API JSON at runtime with the parsers in `frontend/src/lib/financial-types.ts`; TypeScript annotations alone do not validate responses.
 - Keep KPI and monthly calculations in `frontend/src/lib/financial-utils.ts`; avoid duplicating them in visual components.
 - Reuse backend movement-filtering and chronological-order helpers where applicable.
 - Update relevant frontend or backend tests when changing calculation or route behavior.
@@ -48,7 +49,7 @@ After every new implementation, update the relevant document in `./memory-bank` 
 
 - Backend routes generate 360 example movements: 30 per month across 12 months, using seed `42` and dates relative to the current date.
 - Frontend profit is income minus outcome; profit percentage is profit divided by income, or zero when income is zero.
-- The dashboard title is currently fixed to `2024 - Full Year`; do not assume it matches the generated date range.
+- The dashboard title is currently fixed to `2024 - Año completo`; do not assume it matches the generated date range.
 - Do not describe generated movements as persisted data or the calculations as approved business requirements without a specification.
 
 ## Integration limits
@@ -56,3 +57,10 @@ After every new implementation, update the relevant document in `./memory-bank` 
 - Vite proxies `/api` to `http://backend:8000`, matching the Compose service. The hostname is not guaranteed to resolve outside the Compose network.
 - When changing API fields or allowed values, update both backend models and frontend types in the same change.
 - When changing generated dates, review the dashboard's displayed period as well.
+
+## Relevant skills
+
+- Use `.agents/skills/accessibility/SKILL.md` for UI accessibility work; validate semantic controls, keyboard/focus behavior, labels, contrast, and dynamic status announcements.
+- Use `.agents/skills/frontend-design/SKILL.md` for visual interface work; validate choices against the financial dashboard's purpose, the brief, responsive usability, and accessibility.
+- Use `.agents/skills/vercel-react-best-practices/SKILL.md` for React performance work; select relevant rules and verify optimization claims with an appropriate check.
+- Use `.agents/skills/financial-api-contracts/SKILL.md` for financial API fields, query parameters, runtime response parsing, and cross-layer calculations; validate backend models, frontend types/parsers, and relevant tests.

@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type MonthlyDataPoint } from '@/lib/financial-types'
@@ -40,14 +41,14 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
           className="inline-block h-2 w-2 rounded-full"
           style={{ backgroundColor: 'var(--chart-profit)' }}
         />
-        <span className="text-muted-foreground">Profit margin:</span>
+        <span className="text-muted-foreground">Margen de beneficio:</span>
         <span className="font-medium text-foreground ml-auto pl-4">{value.toFixed(1)}%</span>
       </div>
     </div>
   )
 }
 
-export function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
+export const ProfitPercentChart = memo(function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
   if (loading) {
     return (
       <Card className="border-border/60">
@@ -67,13 +68,13 @@ export function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
   return (
     <Card className="border-border/60">
       <CardHeader className="pb-4">
-        <CardTitle className="text-base font-semibold">Profit Margin %</CardTitle>
-        <CardDescription>Monthly profit as a percentage of total income</CardDescription>
+        <CardTitle className="text-base font-semibold">Margen de beneficio (%)</CardTitle>
+        <CardDescription>Beneficio mensual como porcentaje de los ingresos</CardDescription>
       </CardHeader>
       <CardContent>
         {!hasData ? (
           <div className="flex h-[280px] items-center justify-center text-muted-foreground text-sm">
-            No data available to display
+            No hay datos para mostrar
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={280}>
@@ -106,8 +107,25 @@ export function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
               />
             </LineChart>
           </ResponsiveContainer>
+          <table className="sr-only">
+            <caption>Datos mensuales del margen de beneficio</caption>
+            <thead>
+              <tr>
+                <th scope="col">Mes</th>
+                <th scope="col">Margen de beneficio</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((point) => (
+                <tr key={point.month}>
+                  <th scope="row">{point.month}</th>
+                  <td>{point.profitPercent.toFixed(1)}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </CardContent>
     </Card>
   )
-}
+})

@@ -18,10 +18,10 @@ Este documento recoge únicamente las cinco afirmaciones revisadas contra el có
 
 ## 3. El año del encabezado no está sincronizado con las fechas generadas
 
-- **Afirmación principal:** El encabezado muestra `2024 - Full Year`, mientras que las fechas de los movimientos se calculan según la fecha actual.
+- **Afirmación principal:** El encabezado muestra `2024 - Año completo`, mientras que las fechas de los movimientos se calculan según la fecha actual.
 - **Archivos revisados:** [frontend/src/App.tsx](frontend/src/App.tsx), [backend/app/routes.py](backend/app/routes.py).
 - **Resultado / confirmación:** **Confirmado.** El título se pasa como texto fijo en `App.tsx`. El backend asigna los movimientos al año actual o al anterior según el mes y la fecha actual. Con fecha del sistema en octubre de 2026, el rango generado abarca octubre de 2025 a septiembre de 2026.
-- **Corrección:** Sustituir la afirmación anterior de que el título y los datos coinciden por esta regla: el título es fijo en 2024 y el período de los datos depende de la fecha actual; no se garantiza que coincidan.
+- **Corrección:** El título localizado sigue siendo fijo en 2024 y el período de los datos depende de la fecha actual; no se garantiza que coincidan.
 
 ## 4. El proxy `/api` apunta al servicio backend de Compose
 

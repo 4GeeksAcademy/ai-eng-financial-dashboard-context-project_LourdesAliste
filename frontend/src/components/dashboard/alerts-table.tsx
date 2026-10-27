@@ -37,8 +37,8 @@ export function AlertsTable({
     <Card className="border-border/60">
       <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <CardTitle className="text-base font-semibold">Alertas de gasto</CardTitle>
-          <CardDescription>Períodos con incremento sobre la media de referencia</CardDescription>
+          <CardTitle className="text-base font-semibold">Alertas de egresos</CardTitle>
+          <CardDescription>Períodos en los que los egresos superan la media de referencia</CardDescription>
         </div>
         <label className="flex flex-col gap-1.5 text-sm font-medium">
           Umbral de alerta
@@ -71,7 +71,7 @@ export function AlertsTable({
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px] text-left text-sm">
-              <thead className="border-b border-border text-xs uppercase text-muted-foreground">
+              <thead className="border-b border-border text-xs text-muted-foreground">
                 <tr>
                   <th scope="col" className="px-3 py-3">Período</th>
                   <th scope="col" className="px-3 py-3">Gasto registrado</th>

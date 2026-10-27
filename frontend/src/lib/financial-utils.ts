@@ -12,7 +12,7 @@ function formatMonthYearLabel(yearMonthKey: string): string {
   const [yearText, monthText] = yearMonthKey.split("-");
   const year = Number(yearText);
   const month = Number(monthText) - 1;
-  return new Date(year, month, 1).toLocaleDateString("en-US", {
+  return new Date(year, month, 1).toLocaleDateString("es-US", {
     month: "short",
     year: "numeric",
   });
@@ -67,7 +67,7 @@ export function computeMonthlyData(
 }
 
 export function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat("es-US", {
     style: "currency",
     currency: "USD",
     minimumFractionDigits: 0,

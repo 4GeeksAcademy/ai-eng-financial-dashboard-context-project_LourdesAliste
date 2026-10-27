@@ -6,6 +6,9 @@ import { KPIRow } from "@/components/dashboard/kpi-row";
 import { IncomeOutcomeChart } from "@/components/dashboard/income-outcome-chart";
 import { ProfitPercentChart } from "@/components/dashboard/profit-percent-chart";
 import {
+  parseAlertsResponse,
+  parseFacetsResponse,
+  parseFinancialMovements,
   type AlertsParams,
   type AlertsResponse,
   type DateRangeFilter,
@@ -31,7 +34,7 @@ async function fetchFinancialData(
   if (!response.ok) {
     throw new Error(`Failed to fetch financial data: ${response.status}`);
   }
-  return response.json();
+  return parseFinancialMovements(await response.json());
 }
 
 async function fetchFacets(): Promise<FacetsResponse> {
@@ -39,7 +42,7 @@ async function fetchFacets(): Promise<FacetsResponse> {
   if (!response.ok) {
     throw new Error(`Failed to fetch available date range: ${response.status}`);
   }
-  return response.json();
+  return parseFacetsResponse(await response.json());
 }
 
 async function fetchAlerts(
@@ -58,7 +61,7 @@ async function fetchAlerts(
   if (!response.ok) {
     throw new Error(`Failed to fetch alerts: ${response.status}`);
   }
-  return response.json();
+  return parseAlertsResponse(await response.json());
 }
 
 function App() {
@@ -163,7 +166,7 @@ function App() {
     <main className="dark min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-8">
-          <DashboardHeader period="2024 - Full Year" />
+          <DashboardHeader period="2024 - Año completo" />
 
           <DateRangeFilterControl
             startDate={startDate}
@@ -176,17 +179,22 @@ function App() {
           />
 
           {error ? (
-            <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground">
+            <div role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive-foreground">
               {error}
             </div>
           ) : null}
 
-          <section aria-label="Key performance indicators">
+          <p role="status" className="sr-only">
+            {loading ? "Cargando métricas financieras." : ""}
+          </p>
+
+          <section aria-label="Indicadores clave" aria-busy={loading}>
             <KPIRow metrics={metrics} loading={loading} />
           </section>
 
           <section
-            aria-label="Financial charts"
+            aria-label="Gráficos financieros"
+            aria-busy={loading}
             className="grid grid-cols-1 gap-4 xl:grid-cols-2"
           >
             <IncomeOutcomeChart data={monthlyData} loading={loading} />
