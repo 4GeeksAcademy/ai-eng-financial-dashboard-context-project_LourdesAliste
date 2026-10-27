@@ -163,7 +163,7 @@ function App() {
     <main className="dark min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-8">
-          <DashboardHeader period="2024 - Full Year" />
+          <DashboardHeader period="2024 - Año completo" />
 
           <DateRangeFilterControl
             startDate={startDate}
@@ -185,12 +185,12 @@ function App() {
             {loading ? "Cargando métricas financieras." : ""}
           </p>
 
-          <section aria-label="Key performance indicators" aria-busy={loading}>
+          <section aria-label="Indicadores clave" aria-busy={loading}>
             <KPIRow metrics={metrics} loading={loading} />
           </section>
 
           <section
-            aria-label="Financial charts"
+            aria-label="Gráficos financieros"
             aria-busy={loading}
             className="grid grid-cols-1 gap-4 xl:grid-cols-2"
           >

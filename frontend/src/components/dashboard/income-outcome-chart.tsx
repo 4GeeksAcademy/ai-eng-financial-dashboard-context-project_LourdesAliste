@@ -67,13 +67,13 @@ export const IncomeOutcomeChart = memo(function IncomeOutcomeChart({ data, loadi
   return (
     <Card className="border-border/60">
       <CardHeader className="pb-4">
-        <CardTitle className="text-base font-semibold">Income vs. Outcome</CardTitle>
-        <CardDescription>Monthly revenue and expenditure evolution</CardDescription>
+        <CardTitle className="text-base font-semibold">Ingresos y egresos</CardTitle>
+        <CardDescription>Evolución mensual de ingresos y egresos</CardDescription>
       </CardHeader>
       <CardContent>
         {!hasData ? (
           <div className="flex h-[280px] items-center justify-center text-muted-foreground text-sm">
-            No data available to display
+            No hay datos para mostrar
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={280}>
@@ -101,7 +101,7 @@ export const IncomeOutcomeChart = memo(function IncomeOutcomeChart({ data, loadi
               <Line
                 type="monotone"
                 dataKey="income"
-                name="income"
+                name="Ingresos"
                 stroke="var(--chart-income)"
                 strokeWidth={2}
                 dot={{ r: 3, fill: 'var(--chart-income)', strokeWidth: 0 }}
@@ -110,7 +110,7 @@ export const IncomeOutcomeChart = memo(function IncomeOutcomeChart({ data, loadi
               <Line
                 type="monotone"
                 dataKey="outcome"
-                name="outcome"
+                name="Egresos"
                 stroke="var(--chart-outcome)"
                 strokeWidth={2}
                 dot={{ r: 3, fill: 'var(--chart-outcome)', strokeWidth: 0 }}
@@ -119,12 +119,12 @@ export const IncomeOutcomeChart = memo(function IncomeOutcomeChart({ data, loadi
             </LineChart>
           </ResponsiveContainer>
           <table className="sr-only">
-            <caption>Monthly income and outcome data</caption>
+            <caption>Datos mensuales de ingresos y egresos</caption>
             <thead>
               <tr>
-                <th scope="col">Month</th>
-                <th scope="col">Income</th>
-                <th scope="col">Outcome</th>
+                <th scope="col">Mes</th>
+                <th scope="col">Ingresos</th>
+                <th scope="col">Egresos</th>
               </tr>
             </thead>
             <tbody>

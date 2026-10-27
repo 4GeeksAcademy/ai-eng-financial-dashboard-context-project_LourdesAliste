@@ -57,3 +57,13 @@ Los comandos están documentados en [README.es.md](../README.es.md) y sus script
 - Frontend: `http://localhost:5173`
 - API: `http://localhost:8000/health` y `http://localhost:8000/api/metrics`
 - Documentación de API: `http://localhost:8000/docs`
+
+## Herramientas y skills del agente
+
+### frontend-design
+
+**Motivo de instalación**: orientar al agente en el diseño y la implementación de interfaces frontend, buscando una presentación visual coherente y adecuada al propósito del producto.
+
+**Uso**: aplicar esta skill al crear o modificar pantallas y componentes visuales.
+
+**Criterios**: respetar la arquitectura, las tecnologías y los requisitos funcionales del proyecto, y comprobar que los cambios no perjudican la usabilidad ni la accesibilidad.

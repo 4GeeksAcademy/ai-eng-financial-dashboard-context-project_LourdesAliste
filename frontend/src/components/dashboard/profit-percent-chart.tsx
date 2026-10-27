@@ -41,7 +41,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
           className="inline-block h-2 w-2 rounded-full"
           style={{ backgroundColor: 'var(--chart-profit)' }}
         />
-        <span className="text-muted-foreground">Profit margin:</span>
+        <span className="text-muted-foreground">Margen de beneficio:</span>
         <span className="font-medium text-foreground ml-auto pl-4">{value.toFixed(1)}%</span>
       </div>
     </div>
@@ -68,13 +68,13 @@ export const ProfitPercentChart = memo(function ProfitPercentChart({ data, loadi
   return (
     <Card className="border-border/60">
       <CardHeader className="pb-4">
-        <CardTitle className="text-base font-semibold">Profit Margin %</CardTitle>
-        <CardDescription>Monthly profit as a percentage of total income</CardDescription>
+        <CardTitle className="text-base font-semibold">Margen de beneficio (%)</CardTitle>
+        <CardDescription>Beneficio mensual como porcentaje de los ingresos</CardDescription>
       </CardHeader>
       <CardContent>
         {!hasData ? (
           <div className="flex h-[280px] items-center justify-center text-muted-foreground text-sm">
-            No data available to display
+            No hay datos para mostrar
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={280}>
@@ -108,11 +108,11 @@ export const ProfitPercentChart = memo(function ProfitPercentChart({ data, loadi
             </LineChart>
           </ResponsiveContainer>
           <table className="sr-only">
-            <caption>Monthly profit margin data</caption>
+            <caption>Datos mensuales del margen de beneficio</caption>
             <thead>
               <tr>
-                <th scope="col">Month</th>
-                <th scope="col">Profit margin</th>
+                <th scope="col">Mes</th>
+                <th scope="col">Margen de beneficio</th>
               </tr>
             </thead>
             <tbody>
